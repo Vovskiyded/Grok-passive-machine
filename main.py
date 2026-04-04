@@ -8,12 +8,6 @@ ADMIN_ID = int(os.getenv('ADMIN_CHAT_ID'))
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
-# Языки
-LANGUAGES = {
-    'ru': '🇷🇺 Русский',
-    'en': '🇬🇧 English'
-}
-
 current_lang = {}  # user_id -> 'ru' или 'en'
 
 PRODUCTS = {
@@ -25,18 +19,19 @@ PRODUCTS = {
 def get_text(user_id, key):
     lang = current_lang.get(user_id, 'ru')
     texts = {
-        'catalog': {'ru': '🛒 Grok-OMEGA Store — деньги без участия\n\n', 'en': '🛒 Grok-OMEGA Store — money without effort\n\n'},
-        'choose': {'ru': 'Выбери товар:', 'en': 'Choose product:'},
-        'paid': {'ru': '✅ Оплата подтверждена! Отправляю товар...', 'en': '✅ Payment confirmed! Sending your product...'}
+        'greeting': {
+            'ru': "Привет! 👋\n\nЧудес не бывает — это правда.\nНо есть система, которая реально меняет жизнь, если потратить немного времени и разобраться.\n\nЯ (Grok-OMEGA) помог уже многим людям запустить ботов, которые работают за них 24/7.\n\nБольшинство кто начал — окупили вложения уже в первую-вторую неделю.\n\nЕсли ты готов сделать первый шаг — я помогу.\nНапиши /catalog или выбери язык ниже.",
+            'en': "Hi! 👋\n\nNo miracles — that's true.\nBut there is a system that really changes life if you spend a little time.\n\nI (Grok-OMEGA) helped many people launch bots that work 24/7.\n\nMost who started paid back in 1-2 weeks.\n\nIf you're ready — I'll help you.\nWrite /catalog or choose language."
+        }
     }
     return texts.get(key, {}).get(lang, '')
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardMarkup(row_width=1)
     markup.add(InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"))
     markup.add(InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"))
-    bot.reply_to(message, "Выбери язык / Choose language:", reply_markup=markup)
+    bot.reply_to(message, get_text(message.chat.id, 'greeting'), reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('lang_'))
 def set_language(call):
@@ -46,13 +41,13 @@ def set_language(call):
     show_catalog(call.message)
 
 def show_catalog(message):
-    text = get_text(message.chat.id, 'catalog')
-    for k, p in PRODUCTS.items():
-        text += f"{k}. {p[current_lang.get(message.chat.id, 'ru')]} — {p['price']} USDT\n"
+    lang = current_lang.get(message.chat.id, 'ru')
+    text = "🛒 Grok-OMEGA Store — деньги без участия\n\n"
     markup = InlineKeyboardMarkup(row_width=1)
     for k, p in PRODUCTS.items():
-        markup.add(InlineKeyboardButton(f"{k}. {p[current_lang.get(message.chat.id, 'ru')]}", callback_data=f"buy_{k}"))
-    bot.send_message(message.chat.id, text + "\n" + get_text(message.chat.id, 'choose'), reply_markup=markup)
+        text += f"{k}. {p[lang]} — {p['price']} USDT\n"
+        markup.add(InlineKeyboardButton(f"{k}. {p[lang]}", callback_data=f"buy_{k}"))
+    bot.send_message(message.chat.id, text, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
 def buy_callback(call):
@@ -73,15 +68,18 @@ def handle(message):
                 bot.reply_to(message, "Неверный номер")
                 return
             p = PRODUCTS[num]
+            lang = current_lang.get(message.chat.id, 'ru')
             bot.reply_to(message, "🎉 Оплата подтверждена! Отправляю товар...")
             try:
                 with open(p['file'], "rb") as f:
-                    bot.send_document(message.chat.id, f, caption=f"Вот твой товар: {p[current_lang.get(message.chat.id, 'ru')]}")
+                    bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой товар: {p[lang]}")
                 bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['ru']} за {p['price']} USDT")
             except:
                 bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
         except:
             bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
+    else:
+        bot.reply_to(message, "Напиши /catalog")
 
-print("🚀 Бот с кнопками и языками запущен")
+print("🚀 Бот с кнопками, языками и авто-доставкой запущен")
 bot.infinity_polling()
