@@ -1,7 +1,6 @@
 import os
 import telebot
 import requests
-import time
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CRYPTO_WALLET = os.getenv('CRYPTO_WALLET')
@@ -15,20 +14,18 @@ PRODUCTS = {
     "3": {"name": "Арбитраж-бот", "price": 37, "file": "arbitrage_bot.py"}
 }
 
-# Проверка транзакции TRC20
-def check_trx(txid, expected_amount_usdt):
+# Проверка TXID
+def check_trx(txid, expected_amount):
     try:
         url = f"https://apilist.tronscanapi.com/api/transaction?hash={txid}"
-        resp = requests.get(url, timeout=10).json()
-        if not resp.get('data'):
+        data = requests.get(url, timeout=10).json()
+        if not data.get('data'):
             return False, "Транзакция не найдена"
-        
-        tx = resp['data'][0]
-        if tx['ownerAddress'] == CRYPTO_WALLET.lower() and tx['toAddress'] == CRYPTO_WALLET.lower():
-            amount = tx.get('amount', 0) / 1_000_000  # USDT = 6 decimals
-            if amount >= expected_amount_usdt - 0.5:  # небольшая погрешность
-                return True, f"✅ Оплата {amount} USDT подтверждена"
-        return False, "Сумма или адрес не совпадает"
+        tx = data['data'][0]
+        amount = tx.get('amount', 0) / 1_000_000
+        if amount >= expected_amount - 0.5:
+            return True, f"✅ Оплата {amount} USDT подтверждена"
+        return False, "Сумма не совпадает"
     except:
         return False, "Ошибка проверки TXID"
 
@@ -43,16 +40,15 @@ def catalog(message):
 @bot.message_handler(func=lambda m: True)
 def handle(message):
     text = message.text.strip().upper()
-    
     if "ОПЛАТИЛ" in text:
         try:
             num = text.split()[1]
             if num not in PRODUCTS:
-                bot.reply_to(message, "Неверный номер")
+                bot.reply_to(message, "Неверный номер товара")
                 return
             p = PRODUCTS[num]
-            bot.reply_to(message, f"✅ Вы выбрали: {p['name']}\n\nОтправь TXID транзакции (из Trust Wallet или TronScan)")
-            bot.register_next_step_handler(message, lambda m: process_payment(m, num))
+            bot.reply_to(message, f"✅ Вы выбрали: {p['name']}\n\nОплата: {p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nОтправь TXID транзакции")
+            bot.register_next_step_handler(message, lambda m2: process_payment(m2, num))
         except:
             bot.reply_to(message, "Напиши «ОПЛАТИЛ X», где X — номер товара")
     else:
@@ -61,21 +57,18 @@ def handle(message):
 def process_payment(message, num):
     txid = message.text.strip()
     p = PRODUCTS[num]
-    
     bot.reply_to(message, "🔍 Проверяю оплату...")
     success, msg = check_trx(txid, p['price'])
-    
     if success:
         bot.reply_to(message, msg)
-        # Отправляем файл
         try:
             with open(p['file'], "rb") as f:
                 bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой товар: {p['name']}")
-            bot.send_message(ADMIN_ID, f"🎉 Продажа! Клиент купил {p['name']} (TXID: {txid})")
+            bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['name']} за {p['price']} USDT (TXID: {txid})")
         except:
-            bot.reply_to(message, "Файл готов, но произошла ошибка отправки. Напиши @Volodya")
+            bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
     else:
         bot.reply_to(message, f"❌ {msg}\nПроверь TXID и попробуй ещё раз.")
 
-print("🚀 Бот с авто-проверкой оплаты запущен")
+print("🚀 Бот с авто-проверкой и реквизитами запущен")
 bot.infinity_polling()
