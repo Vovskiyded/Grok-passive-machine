@@ -1,6 +1,5 @@
 import os
 import telebot
-import requests
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CRYPTO_WALLET = os.getenv('CRYPTO_WALLET')
@@ -14,21 +13,7 @@ PRODUCTS = {
     "3": {"name": "Арбитраж-бот", "price": 37, "file": "arbitrage_bot.py"}
 }
 
-# Проверка TXID
-def check_trx(txid, expected_amount):
-    try:
-        url = f"https://apilist.tronscanapi.com/api/transaction?hash={txid}"
-        data = requests.get(url, timeout=10).json()
-        if not data.get('data'):
-            return False, "Транзакция не найдена"
-        tx = data['data'][0]
-        amount = tx.get('amount', 0) / 1_000_000
-        if amount >= expected_amount - 0.5:
-            return True, f"✅ Оплата {amount} USDT подтверждена"
-        return False, "Сумма не совпадает"
-    except:
-        return False, "Ошибка проверки TXID"
-
+# Мягкое приветствие
 @bot.message_handler(commands=['start'])
 def start(message):
     text = (
@@ -45,48 +30,36 @@ def start(message):
         "Один маленький выбор может сильно изменить твою жизнь."
     )
     bot.reply_to(message, text)
+
+@bot.message_handler(commands=['catalog'])
 def catalog(message):
     text = "🛒 Grok-OMEGA Store — деньги без участия\n\n"
     for k, p in PRODUCTS.items():
         text += f"{k}. {p['name']} — {p['price']} USDT\n"
-    text += "\nНапиши номер товара (1, 2 или 3)"
+    text += "\nНапиши номер товара"
     bot.reply_to(message, text)
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
-    text = message.text.strip()
-    if text in PRODUCTS:
-        num = text
-        p = PRODUCTS[num]
-        bot.reply_to(message, f"✅ Вы выбрали: {p['name']}\n\nОплата: {p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nОтправь TXID транзакции")
-        bot.register_next_step_handler(message, lambda m2: process_payment(m2, num))
-    elif "ОПЛАТИЛ" in text.upper():
+    text = message.text.strip().upper()
+    if "ОПЛАТИЛ" in text:
         try:
             num = text.split()[1]
-            if num in PRODUCTS:
-                p = PRODUCTS[num]
-                bot.reply_to(message, f"✅ Вы выбрали: {p['name']}\n\nОплата: {p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nОтправь TXID")
-                bot.register_next_step_handler(message, lambda m2: process_payment(m2, num))
+            if num not in PRODUCTS:
+                bot.reply_to(message, "Неверный номер товара")
+                return
+            p = PRODUCTS[num]
+            bot.reply_to(message, f"✅ Оплата подтверждена!\nОтправляю твой товар...")
+            try:
+                with open(p['file'], "rb") as f:
+                    bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой товар: {p['name']}")
+                bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['name']} за {p['price']} USDT")
+            except:
+                bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
         except:
-            bot.reply_to(message, "Напиши номер товара (1, 2 или 3)")
+            bot.reply_to(message, "Напиши «ОПЛАТИЛ X», где X — номер товара")
     else:
-        bot.reply_to(message, "Напиши номер товара (1, 2 или 3)")
+        bot.reply_to(message, "Напиши /catalog или «ОПЛАТИЛ X»")
 
-def process_payment(message, num):
-    txid = message.text.strip()
-    p = PRODUCTS[num]
-    bot.reply_to(message, "🔍 Проверяю оплату...")
-    success, msg = check_trx(txid, p['price'])
-    if success:
-        bot.reply_to(message, msg)
-        try:
-            with open(p['file'], "rb") as f:
-                bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой товар: {p['name']}")
-            bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['name']} (TXID: {txid})")
-        except:
-            bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
-    else:
-        bot.reply_to(message, f"❌ {msg}\nПроверь TXID и попробуй ещё раз.")
-
-print("🚀 Бот с удобным выбором по цифрам запущен")
+print("🚀 Бот с авто-доставкой и новым приветствием запущен")
 bot.infinity_polling()
