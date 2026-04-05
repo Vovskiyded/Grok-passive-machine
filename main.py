@@ -60,7 +60,7 @@ def buy_callback(call):
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, p['teaser'])
     bot.send_message(call.message.chat.id,
-        f"✅ Вы выбрали: {p[lang]}\n\nОплата: ${p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nПосле оплаты напиши \"ОПЛАТИЛ {num}\"")
+                     "✅ Вы выбрали: " + p[lang] + "\n\nОплата: $" + str(p['price']) + " USDT (TRC20)\nПереведи на:\n" + CRYPTO_WALLET + "\n\nПосле оплаты напиши \"ОПЛАТИЛ " + num + "\"")
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
@@ -76,8 +76,8 @@ def handle(message):
             bot.reply_to(message, "🎉 Оплата подтверждена! Отправляю полный товар...")
             try:
                 with open(p['file'], "rb") as f:
-                    bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой полный товар: {p[lang]}")
-                bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['ru']} за ${p['price']} USDT")
+                    bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang])
+                bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
             except:
                 bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
         except:
