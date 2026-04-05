@@ -30,7 +30,7 @@ PRODUCTS = {
           "teaser_ru": "Тизер: Пошаговый план пассивного дохода от 1000$ в месяц. Полный blueprint — после оплаты."}
 }
 
-def check_payment(txid, expected_amount):
+def check_trx(txid, expected_amount):
     try:
         url = f"https://apilist.tronscanapi.com/api/transaction?hash={txid}"
         data = requests.get(url, timeout=10).json()
@@ -38,10 +38,9 @@ def check_payment(txid, expected_amount):
             return False, "Транзакция не найдена"
         tx = data['data'][0]
         amount = tx.get('amount', 0) / 1000000
-        to_address = tx.get('to', '')
-        if amount >= expected_amount - 1 and CRYPTO_WALLET.lower() in to_address.lower():
-            return True, f"✅ Оплата {amount} USDT подтверждена"
-        return False, "Сумма или адрес не совпадают"
+        if amount >= expected_amount - 1:
+            return True, f"✅ Оплата {amount:.2f} USDT подтверждена"
+        return False, "Сумма не совпадает"
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
@@ -91,31 +90,4 @@ def handle(message):
             if num not in PRODUCTS:
                 bot.reply_to(message, "Неверный номер")
                 return
-            p = PRODUCTS[num]
-            lang = current_lang.get(message.chat.id, 'ru')
-            bot.reply_to(message, "Пришли TXID транзакции")
-            bot.register_next_step_handler(message, lambda m2: process_tx(m2, num))
-        except:
-            bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
-    else:
-        bot.reply_to(message, "Напиши /catalog")
-
-def process_tx(message, num):
-    txid = message.text.strip()
-    p = PRODUCTS[num]
-    lang = current_lang.get(message.chat.id, 'ru')
-    bot.reply_to(message, "🔍 Проверяю оплату...")
-    success, msg = check_payment(txid, p['price'])
-    if success:
-        bot.reply_to(message, msg)
-        try:
-            with open(p['file'], "rb") as f:
-                bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang])
-            bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
-        except:
-            bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
-    else:
-        bot.reply_to(message, msg + "\nПроверь TXID и попробуй ещё раз.")
-
-print("🚀 Бот с автоматической проверкой оплаты запущен")
-bot.infinity_polling()
+            bot
