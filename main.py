@@ -29,22 +29,12 @@ PRODUCTS = {
           "teaser": "🔹 Тизер: Пошаговый план запуска пассивного дохода от 1000$ в месяц. Полный blueprint — после оплаты."}
 }
 
-def get_text(user_id, key):
-    lang = current_lang.get(user_id, 'ru')
-    texts = {
-        'greeting': {
-            'ru': "Привет! 👋\n\nЧудес не бывает — это правда.\nНо есть система, которая реально меняет жизнь...\n\nНапиши /catalog или выбери язык ниже.",
-            'en': "Hi! 👋\n\nNo miracles — that's true.\nBut there is a system that really changes life...\n\nWrite /catalog or choose language."
-        }
-    }
-    return texts.get(key, {}).get(lang, '')
-
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"))
     markup.add(InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"))
-    bot.reply_to(message, get_text(message.chat.id, 'greeting'), reply_markup=markup)
+    bot.reply_to(message, "Привет! 👋\n\nВыбери язык / Choose language:", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('lang_'))
 def set_language(call):
@@ -68,7 +58,9 @@ def buy_callback(call):
     p = PRODUCTS[num]
     lang = current_lang.get(call.from_user.id, 'ru')
     bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, p['teaser'])  # ← Тизер перед оплатой
+    # Показываем тизер-инструкцию ПЕРЕД оплатой
+    bot.send_message(call.message.chat.id, p['teaser'])
+    # Просим оплату
     bot.send_message(call.message.chat.id, 
         f"✅ Вы выбрали: {p[lang]}\n\nОплата: ${p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nПосле оплаты напиши «ОПЛАТИЛ {num}»")
 
