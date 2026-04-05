@@ -5,6 +5,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CRYPTO_WALLET = os.getenv('CRYPTO_WALLET')
 ADMIN_ID = int(os.getenv('ADMIN_CHAT_ID'))
+SUPPORT_USERNAME = os.getenv('SUPPORT_USERNAME', '@Volodya')   # ← здесь твой username
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
@@ -12,21 +13,29 @@ current_lang = {}
 
 PRODUCTS = {
     "1": {"ru": "Готовый бот для авто-продаж", "en": "Ready sales bot", "price": 25, "file": "sales_bot.py",
-          "teaser_ru": "🔹 Тизер: Представь, что твой Telegram-бот работает 24/7 без твоего участия. Он сам показывает каталог, принимает оплату и мгновенно выдаёт товары клиентам. Это готовая система авто-продаж, которая уже приносит деньги сотням людей. Полный код и настройка — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: Этот бот автоматически показывает каталог, принимает оплату и выдаёт товары 24/7. Полный код — после оплаты.",
+          "teaser_en": "🔹 Teaser: This bot automatically shows catalog, accepts payment and delivers products 24/7. Full code — after payment."},
     "2": {"ru": "100 промптов Grok-OMEGA", "en": "100 Grok-OMEGA prompts", "price": 12, "file": "prompts.txt",
-          "teaser_ru": "🔹 Тизер: 100 самых мощных промптов, которые позволяют за секунды генерировать продающий контент, идеи бизнеса и автоматизацию. Вот первые 5 примеров (полный список 100 промптов — сразу после оплаты)."},
+          "teaser_ru": "🔹 Тизер: 100 самых мощных промптов для бизнеса и заработка. Полный список — после оплаты.",
+          "teaser_en": "🔹 Teaser: 100 most powerful prompts for business and earnings. Full list — after payment."},
     "3": {"ru": "Арбитраж-бот", "en": "Arbitrage bot", "price": 37, "file": "arbitrage_bot.py",
-          "teaser_ru": "🔹 Тизер: Этот бот автоматически мониторит биржи и находит разницу в ценах, показывая тебе готовые возможности для арбитража. Работает на любом капитале. Полный код и настройка — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: Автоматически ищет разницу цен на биржах. Полный код — после оплаты.",
+          "teaser_en": "🔹 Teaser: Automatically finds price differences on exchanges. Full code — after payment."},
     "4": {"ru": "TikTok Автопостинг бот", "en": "TikTok Auto-Poster Bot", "price": 59, "file": "tiktok_bot.py",
-          "teaser_ru": "🔹 Тизер: Бот сам генерирует видео, текст и публикует посты в TikTok каждые 4 часа. Ты просто загружаешь стоковое видео и отдыхаешь. Полный код — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: Публикует видео в TikTok каждые 4 часа без твоего участия. Полный код — после оплаты.",
+          "teaser_en": "🔹 Teaser: Posts videos to TikTok every 4 hours without your involvement. Full code — after payment."},
     "5": {"ru": "Продвинутая воронка продаж", "en": "Advanced Sales Funnel", "price": 49, "file": "funnel_bot.py",
-          "teaser_ru": "🔹 Тизер: 5-шаговая воронка, которая автоматически приветствует клиента, показывает каталог, принимает оплату и выдаёт товар. Полная настройка и готовый код — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: 5-шаговая воронка, которая ведёт клиента до оплаты. Полная настройка — после оплаты.",
+          "teaser_en": "🔹 Teaser: 5-step funnel that guides the client to payment. Full setup — after payment."},
     "6": {"ru": "Faceless Content Pack", "en": "Faceless Content Pack", "price": 39, "file": "faceless_pack.txt",
-          "teaser_ru": "🔹 Тизер: 50 готовых идей контента без лица + шаблоны видео и текстов. Идеально для тех, кто хочет зарабатывать на TikTok и YouTube без камеры. Полный пак с 200+ материалами — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: 50 готовых идей контента без лица. Полный пак — после оплаты.",
+          "teaser_en": "🔹 Teaser: 50 ready faceless content ideas. Full pack — after payment."},
     "7": {"ru": "Lead Generation Bot", "en": "Lead Generation Bot", "price": 35, "file": "lead_bot.py",
-          "teaser_ru": "🔹 Тизер: Бот автоматически собирает контакты клиентов из чатов и каналов. Ты получаешь базу лидов, которые уже заинтересованы в твоём продукте. Полный код с парсингом — сразу после оплаты."},
+          "teaser_ru": "🔹 Тизер: Автоматически собирает контакты из чатов. Полный код — после оплаты.",
+          "teaser_en": "🔹 Teaser: Automatically collects contacts from chats. Full code — after payment."},
     "8": {"ru": "Passive Income Blueprint", "en": "Passive Income Blueprint", "price": 27, "file": "blueprint.txt",
-          "teaser_ru": "🔹 Тизер: Пошаговый план запуска пассивного дохода от 1000$ в месяц. С шаблонами, чек-листами и примерами. Полный blueprint — сразу после оплаты."}
+          "teaser_ru": "🔹 Тизер: Пошаговый план пассивного дохода от 1000$ в месяц. Полный blueprint — после оплаты.",
+          "teaser_en": "🔹 Teaser: Step-by-step passive income plan from $1000 per month. Full blueprint — after payment."}
 }
 
 @bot.message_handler(commands=['start'])
@@ -82,11 +91,11 @@ def handle(message):
                     bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang] if lang == 'ru' else "🎉 Your full product: " + p[lang])
                 bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
             except:
-                bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
+                bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши " + SUPPORT_USERNAME)
         except:
             bot.reply_to(message, "Напиши \"ОПЛАТИЛ X\"" if current_lang.get(message.chat.id, 'ru') == 'ru' else "Write \"PAID X\"")
     else:
         bot.reply_to(message, "Напиши /catalog")
 
-print("🚀 Бот с развернутыми тизерами запущен")
+print("🚀 Бот с твоим username в ошибке запущен")
 bot.infinity_polling()
