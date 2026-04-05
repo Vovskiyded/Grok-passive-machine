@@ -58,34 +58,6 @@ def buy_callback(call):
     p = PRODUCTS[num]
     lang = current_lang.get(call.from_user.id, 'ru')
     bot.answer_callback_query(call.id)
-    # Показываем тизер-инструкцию ПЕРЕД оплатой
-    bot.send_message(call.message.chat.id, p['teaser'])
-    # Просим оплату
+    bot.send_message(call.message.chat.id, p['teaser'])   # ← Тизер перед оплатой
     bot.send_message(call.message.chat.id, 
-        f"✅ Вы выбрали: {p[lang]}\n\nОплата: ${p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nПосле оплаты напиши «ОПЛАТИЛ {num}»")
-
-@bot.message_handler(func=lambda m: True)
-def handle(message):
-    text = message.text.strip().upper()
-    if "ОПЛАТИЛ" in text:
-        try:
-            num = text.split()[1]
-            if num not in PRODUCTS:
-                bot.reply_to(message, "Неверный номер")
-                return
-            p = PRODUCTS[num]
-            lang = current_lang.get(message.chat.id, 'ru')
-            bot.reply_to(message, "🎉 Оплата подтверждена! Отправляю полный товар...")
-            try:
-                with open(p['file'], "rb") as f:
-                    bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой полный товар: {p[lang]}")
-                bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['ru']} за ${p['price']} USDT")
-            except:
-                bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
-        except:
-            bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
-    else:
-        bot.reply_to(message, "Напиши /catalog")
-
-print("🚀 Бот с тизерами перед оплатой запущен")
-bot.infinity_polling()
+        f"✅ Вы выбрали: {p[lang]}\n\nОплата:
