@@ -10,6 +10,7 @@ ADMIN_ID = int(os.getenv('ADMIN_CHAT_ID'))
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 current_lang = {}
+pending_tx = {}  # user_id -> product_num
 
 PRODUCTS = {
     "1": {"ru": "Готовый бот для авто-продаж", "en": "Ready sales bot", "price": 25, "file": "sales_bot.py",
@@ -78,37 +79,34 @@ def buy_callback(call):
     bot.send_message(call.message.chat.id, "Оплата: $" + str(p['price']) + " USDT (TRC20)" if lang == 'ru' else "Payment: $" + str(p['price']) + " USDT (TRC20)")
     bot.send_message(call.message.chat.id, "Переведи на:\n" + CRYPTO_WALLET if lang == 'ru' else "Send to:\n" + CRYPTO_WALLET)
     bot.send_message(call.message.chat.id, "После оплаты пришли TXID транзакции")
+    pending_tx[call.from_user.id] = num   # запоминаем, какой товар ждёт оплату
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
-    text = message.text.strip().upper()
-    if "ОПЛАТИЛ" in text:
-        try:
-            num = text.split()[1]
-            if num not in PRODUCTS:
-                bot.reply_to(message, "Неверный номер")
-                return
-            bot.reply_to(message, "Пришли TXID транзакции")
-            bot.register_next_step_handler(message, lambda m2: process_tx(m2, num))
-        except:
-            bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
+    text = message.text.strip()
+    user_id = message.chat.id
 
-def process_tx(message, num):
-    txid = message.text.strip()
-    p = PRODUCTS[num]
-    lang = current_lang.get(message.chat.id, 'ru')
-    bot.reply_to(message, "🔍 Проверяю оплату...")
-    success, msg = check_trx(txid, p['price'])
-    if success:
-        bot.reply_to(message, msg)
-        try:
-            with open(p['file'], "rb") as f:
-                bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang])
-            bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
-        except:
-            bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
+    if user_id in pending_tx:
+        num = pending_tx[user_id]
+        p = PRODUCTS[num]
+        lang = current_lang.get(user_id, 'ru')
+        bot.reply_to(message, "🔍 Проверяю оплату...")
+        success, msg = check_trx(text, p['price'])
+        if success:
+            bot.reply_to(message, msg)
+            try:
+                with open(p['file'], "rb") as f:
+                    bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang])
+                bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
+            except:
+                bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
+            del pending_tx[user_id]   # очищаем ожидание
+        else:
+            bot.reply_to(message, msg + "\nПроверь TXID и попробуй ещё раз.")
+    elif "ОПЛАТИЛ" in text.upper():
+        bot.reply_to(message, "Пришли TXID транзакции")
     else:
-        bot.reply_to(message, msg + "\nПроверь TXID и попробуй ещё раз.")
+        bot.reply_to(message, "Напиши /catalog")
 
-print("🚀 Бот с проверкой TXID запущен")
+print("🚀 Бот с надёжной проверкой TXID запущен")
 bot.infinity_polling()
