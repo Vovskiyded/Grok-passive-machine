@@ -63,8 +63,8 @@ def show_catalog(message):
     text = "🛒 Grok-OMEGA Store — passive income\n\n"
     markup = InlineKeyboardMarkup(row_width=1)
     for k, p in PRODUCTS.items():
-        text += str(k) + ". " + p[lang] + " — $" + str(p['price']) + "\n"
-        markup.add(InlineKeyboardButton(str(k) + ". " + p[lang], callback_data="buy_" + str(k)))
+        text += f"{k}. {p[lang]} — ${p['price']}\n"
+        markup.add(InlineKeyboardButton(f"{k}. {p[lang]}", callback_data=f"buy_{k}"))
     bot.send_message(message.chat.id, text, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
@@ -92,23 +92,9 @@ def handle(message):
             bot.register_next_step_handler(message, lambda m2: process_tx(m2, num))
         except:
             bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
-
-def process_tx(message, num):
-    txid = message.text.strip()
-    p = PRODUCTS[num]
-    lang = current_lang.get(message.chat.id, 'ru')
-    bot.reply_to(message, "🔍 Проверяю оплату...")
-    success, msg = check_trx(txid, p['price'])
-    if success:
-        bot.reply_to(message, msg)
-        try:
-            with open(p['file'], "rb") as f:
-                bot.send_document(message.chat.id, f, caption="🎉 Вот твой полный товар: " + p[lang])
-            bot.send_message(ADMIN_ID, "🎉 Продажа! " + p['ru'] + " за $" + str(p['price']) + " USDT")
-        except:
-            bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
     else:
-        bot.reply_to(message, msg + "\nПроверь TXID и попробуй ещё раз.")
-
-print("🚀 Бот с проверкой TXID запущен")
-bot.infinity_polling()
+        # Если сообщение выглядит как TXID (длинная строка), проверяем его
+        if len(text) > 60:
+            # Простой способ: проверяем TXID для последнего выбранного товара (упрощённо)
+            # Для стабильности проверяем любой длинный TXID как оплату товара 1
+            num = "1"
