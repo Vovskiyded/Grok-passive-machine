@@ -13,15 +13,20 @@ current_lang = {}  # user_id -> 'ru' или 'en'
 PRODUCTS = {
     "1": {"ru": "Готовый бот для авто-продаж", "en": "Ready sales bot", "price": 25, "file": "sales_bot.py"},
     "2": {"ru": "100 промптов Grok-OMEGA", "en": "100 Grok-OMEGA prompts", "price": 12, "file": "prompts.txt"},
-    "3": {"ru": "Арбитраж-бот", "en": "Arbitrage bot", "price": 37, "file": "arbitrage_bot.py"}
+    "3": {"ru": "Арбитраж-бот", "en": "Arbitrage bot", "price": 37, "file": "arbitrage_bot.py"},
+    "4": {"ru": "TikTok Автопостинг бот", "en": "TikTok Auto-Poster Bot", "price": 59, "file": "tiktok_bot.py"},
+    "5": {"ru": "Продвинутая воронка продаж", "en": "Advanced Sales Funnel", "price": 49, "file": "funnel_bot.py"},
+    "6": {"ru": "Faceless Content Pack", "en": "Faceless Content Pack", "price": 39, "file": "faceless_pack.txt"},
+    "7": {"ru": "Lead Generation Bot", "en": "Lead Generation Bot", "price": 35, "file": "lead_bot.py"},
+    "8": {"ru": "Passive Income Blueprint", "en": "Passive Income Blueprint", "price": 27, "file": "blueprint.txt"}
 }
 
 def get_text(user_id, key):
     lang = current_lang.get(user_id, 'ru')
     texts = {
         'greeting': {
-            'ru': "Привет! 👋\n\nЧудес не бывает — это правда.\nНо есть система, которая реально меняет жизнь, если потратить немного времени и разобраться.\n\nЯ (Grok-OMEGA) помог уже многим людям запустить ботов, которые работают за них 24/7.\n\nБольшинство кто начал — окупили вложения уже в первую-вторую неделю.\n\nЕсли ты готов сделать первый шаг — я помогу.\nНапиши /catalog или выбери язык ниже.",
-            'en': "Hi! 👋\n\nNo miracles — that's true.\nBut there is a system that really changes life if you spend a little time.\n\nI (Grok-OMEGA) helped many people launch bots that work 24/7.\n\nMost who started paid back in 1-2 weeks.\n\nIf you're ready — I'll help you.\nWrite /catalog or choose language."
+            'ru': "Привет! 👋\n\nЧудес не бывает — это правда.\nНо есть система, которая реально меняет жизнь, если потратить немного времени и разобраться.\n\nЯ (Grok-OMEGA) помог уже многим людям запустить боты и инструменты, которые работают за них 24/7.\n\nБольшинство кто начал — окупили вложения уже в первую-вторую неделю.\n\nЕсли ты готов сделать первый шаг — я помогу.\nНапиши /catalog или выбери язык ниже.",
+            'en': "Hi! 👋\n\nNo miracles — that's true.\nBut there is a system that really changes life if you spend a little time and figure it out.\n\nI (Grok-OMEGA) helped many people launch bots that work 24/7.\n\nMost who started paid back in 1-2 weeks.\n\nIf you're ready — I'll help you.\nWrite /catalog or choose language."
         }
     }
     return texts.get(key, {}).get(lang, '')
@@ -42,10 +47,10 @@ def set_language(call):
 
 def show_catalog(message):
     lang = current_lang.get(message.chat.id, 'ru')
-    text = "🛒 Grok-OMEGA Store — деньги без участия\n\n"
+    text = "🛒 Grok-OMEGA Store — passive income\n\n"
     markup = InlineKeyboardMarkup(row_width=1)
     for k, p in PRODUCTS.items():
-        text += f"{k}. {p[lang]} — {p['price']} USDT\n"
+        text += f"{k}. {p[lang]} — ${p['price']}\n"
         markup.add(InlineKeyboardButton(f"{k}. {p[lang]}", callback_data=f"buy_{k}"))
     bot.send_message(message.chat.id, text, reply_markup=markup)
 
@@ -56,7 +61,7 @@ def buy_callback(call):
     lang = current_lang.get(call.from_user.id, 'ru')
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, 
-        f"✅ Вы выбрали: {p[lang]}\n\nОплата: {p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nПосле оплаты напиши «ОПЛАТИЛ {num}»")
+        f"✅ Вы выбрали: {p[lang]}\n\nОплата: ${p['price']} USDT (TRC20)\nПереведи на:\n{CRYPTO_WALLET}\n\nПосле оплаты напиши «ОПЛАТИЛ {num}»")
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
@@ -73,7 +78,7 @@ def handle(message):
             try:
                 with open(p['file'], "rb") as f:
                     bot.send_document(message.chat.id, f, caption=f"🎉 Вот твой товар: {p[lang]}")
-                bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['ru']} за {p['price']} USDT")
+                bot.send_message(ADMIN_ID, f"🎉 Продажа! {p['ru']} за ${p['price']} USDT")
             except:
                 bot.reply_to(message, "Файл готов, но ошибка отправки. Напиши @Volodya")
         except:
@@ -81,5 +86,5 @@ def handle(message):
     else:
         bot.reply_to(message, "Напиши /catalog")
 
-print("🚀 Бот с кнопками, языками и авто-доставкой запущен")
+print("🚀 Бот с 8 инструментами, кнопками, языками и авто-доставкой запущен")
 bot.infinity_polling()
