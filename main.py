@@ -65,29 +65,4 @@ def show_catalog(message):
     for k, p in PRODUCTS.items():
         text += f"{k}. {p[lang]} — ${p['price']}\n"
         markup.add(InlineKeyboardButton(f"{k}. {p[lang]}", callback_data=f"buy_{k}"))
-    bot.send_message(message.chat.id, text, reply_markup=markup)
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
-def buy_callback(call):
-    num = call.data.split('_')[1]
-    p = PRODUCTS[num]
-    lang = current_lang.get(call.from_user.id, 'ru')
-    bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, p['teaser_ru'] if lang == 'ru' else p['teaser_en'])
-    bot.send_message(call.message.chat.id,
-        "✅ Вы выбрали: " + p[lang] if lang == 'ru' else "✅ You chose: " + p[lang])
-    bot.send_message(call.message.chat.id,
-        "Оплата: $" + str(p['price']) + " USDT (TRC20)" if lang == 'ru' else "Payment: $" + str(p['price']) + " USDT (TRC20)")
-    bot.send_message(call.message.chat.id, "Переведи на:\n" + CRYPTO_WALLET if lang == 'ru' else "Send to:\n" + CRYPTO_WALLET)
-    bot.send_message(call.message.chat.id, "После оплаты пришли TXID транзакции")
-
-@bot.message_handler(func=lambda m: True)
-def handle(message):
-    text = message.text.strip().upper()
-    if "ОПЛАТИЛ" in text:
-        try:
-            num = text.split()[1]
-            if num not in PRODUCTS:
-                bot.reply_to(message, "Неверный номер")
-                return
-            bot
+    bot.send_message(message.chat.id, text, reply_markup=markup
