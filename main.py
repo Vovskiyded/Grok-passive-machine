@@ -13,43 +13,43 @@ current_lang = {}
 pending_tx = {}
 
 PRODUCTS = {
-    "1": {"ru": "Автоматизация бизнеса (20 кодов)", "en": "Business Automation (20 codes)",
+    "1": {"ru": "Автоматизация бизнеса (20 кодов)", "en": "Business Automation (20 codes)", "ua": "Автоматизація бізнесу (20 кодів)",
           "es": "Automatización de negocios (20 códigos)", "ar": "أتمتة الأعمال (20 كود)", "fr": "Automatisation d'entreprise (20 codes)",
           "price": 39, "file": "automation_codes.txt",
           "teaser_ru": "20 готовых кодов, которые полностью автоматизируют продажи, сбор лидов, постинг, парсинг цен конкурентов и генерацию отчётов. Каждый код идёт с подробной инструкцией. Полная версия — после оплаты."},
-    "2": {"ru": "Коды + подробные инструкции (20 наборов)", "en": "Codes + Instructions (20 sets)",
+    "2": {"ru": "Коды + подробные инструкции (20 наборов)", "en": "Codes + Instructions (20 sets)", "ua": "Коди + інструкції (20 наборів)",
           "es": "Códigos + instrucciones detalladas (20 conjuntos)", "ar": "أكواد + تعليمات مفصلة (20 مجموعة)", "fr": "Codes + instructions détaillées (20 ensembles)",
           "price": 49, "file": "code_instructions.txt",
           "teaser_ru": "20 полных наборов: готовый код + максимально подробная пошаговая инструкция на 10–15 шагов. Идеально даже для полного новичка. Полная версия — после оплаты."},
-    "3": {"ru": "Удалённая работа и заработок", "en": "Remote Work & Earning",
+    "3": {"ru": "Удалённая работа и заработок", "en": "Remote Work & Earning", "ua": "Віддалена робота та заробіток",
           "es": "Trabajo remoto y ganancias", "ar": "العمل عن بعد والكسب", "fr": "Travail à distance et revenus",
           "price": 24.99, "file": "remote_earning.txt",
           "teaser_ru": "Благодаря ИИ не обязательно быть программистом или айтишником, чтобы зарабатывать хорошие деньги. Главное — решимость и желание зарабатывать. Полный гайд по реальным способам дистанционного заработка — после оплаты."},
-    "4": {"ru": "Grok Промпт Арсенал 100", "en": "Grok Prompt Arsenal 100",
+    "4": {"ru": "Grok Промпт Арсенал 100", "en": "Grok Prompt Arsenal 100", "ua": "Grok Промпт Арсенал 100",
           "es": "Grok Prompt Arsenal 100", "ar": "Grok Prompt Arsenal 100", "fr": "Grok Prompt Arsenal 100",
           "price": 9, "file": "prompts.txt",
           "teaser_ru": "100 самых мощных промптов Grok-OMEGA для бизнеса, контента, продаж и заработка. Полный список — после оплаты."},
-    "5": {"ru": "Grok TikTok Rocket", "en": "Grok TikTok Rocket",
+    "5": {"ru": "Grok TikTok Rocket", "en": "Grok TikTok Rocket", "ua": "Grok TikTok Rocket",
           "es": "Grok TikTok Rocket", "ar": "Grok TikTok Rocket", "fr": "Grok TikTok Rocket",
           "price": 49, "file": "tiktok_bot.py",
           "teaser_ru": "Бот, который полностью берёт на себя продвижение в TikTok: сам добавляет текст и публикует faceless-видео каждые 4 часа. Полный код — после оплаты."},
-    "6": {"ru": "Grok Арбитраж Скалпер", "en": "Grok Arbitrage Scalper",
+    "6": {"ru": "Grok Арбитраж Скалпер", "en": "Grok Arbitrage Scalper", "ua": "Grok Арбитраж Скалпер",
           "es": "Grok Arbitrage Scalper", "ar": "Grok Arbitrage Scalper", "fr": "Grok Arbitrage Scalper",
           "price": 29, "file": "arbitrage_bot.py",
           "teaser_ru": "Автоматический поиск разницы цен на биржах в реальном времени. Полный код — после оплаты."},
-    "7": {"ru": "Grok Безликая Фабрика", "en": "Grok Faceless Factory",
+    "7": {"ru": "Grok Безликая Фабрика", "en": "Grok Faceless Factory", "ua": "Grok Безликая Фабрика",
           "es": "Grok Fabrica Sin Rostro", "ar": "Grok مصنع بدون وجه", "fr": "Grok Usine Sans Visage",
           "price": 29, "file": "faceless_pack.txt",
           "teaser_ru": "50 готовых идей faceless-контента + шаблоны. Полный пак — после оплаты."},
-    "8": {"ru": "Grok Lead Hunter", "en": "Grok Lead Hunter",
+    "8": {"ru": "Grok Lead Hunter", "en": "Grok Lead Hunter", "ua": "Grok Lead Hunter",
           "es": "Grok Lead Hunter", "ar": "Grok Lead Hunter", "fr": "Grok Lead Hunter",
           "price": 25, "file": "lead_bot.py",
           "teaser_ru": "Автоматический сбор тёплых лидов из чатов. Полный код — после оплаты."},
-    "9": {"ru": "Grok Passive Blueprint", "en": "Grok Passive Blueprint",
+    "9": {"ru": "Grok Passive Blueprint", "en": "Grok Passive Blueprint", "ua": "Grok Passive Blueprint",
           "es": "Grok Passive Blueprint", "ar": "Grok Passive Blueprint", "fr": "Grok Passive Blueprint",
           "price": 19, "file": "blueprint.txt",
           "teaser_ru": "Пошаговый план запуска пассивного дохода от 1000$ в месяц. Полный blueprint — после оплаты."},
-    "10": {"ru": "Grok Воронка Pro", "en": "Grok Funnel Pro",
+    "10": {"ru": "Grok Воронка Pro", "en": "Grok Funnel Pro", "ua": "Grok Воронка Pro",
            "es": "Grok Funnel Pro", "ar": "Grok Funnel Pro", "fr": "Grok Funnel Pro",
            "price": 35, "file": "funnel_bot.py",
            "teaser_ru": "5-шаговая продающая воронка, которая ведёт клиента до оплаты. Полная настройка — после оплаты."}
@@ -114,7 +114,7 @@ def payment_choice(call):
         pending_tx[call.from_user.id] = num
     else:
         bot.send_message(call.message.chat.id, "Оплата другими способами:\n@grom_ii\n\nПосле оплаты напиши «ОПЛАТИЛ " + num + "»")
-        pending_tx[call.from_user.id] = num)
+        pending_tx[call.from_user.id] = num
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
@@ -154,5 +154,5 @@ def check_trx(txid, expected_amount):
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
-print("🚀 Бот запущен (русский добавлен, украинский удалён)")
+print("🚀 Бот запущен")
 bot.infinity_polling()
