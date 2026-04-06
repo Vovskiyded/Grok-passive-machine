@@ -33,7 +33,7 @@ PRODUCTS = {
           "es": "Grok TikTok Rocket", "ar": "Grok TikTok Rocket", "fr": "Grok TikTok Rocket",
           "price": 49, "file": "tiktok_bot.py",
           "teaser_ru": "Бот, который полностью берёт на себя продвижение в TikTok: сам добавляет текст и публикует faceless-видео каждые 4 часа. Полный код — после оплаты."},
-    "6": {"ru": "Grok Арбитраж Скальпер", "en": "Grok Arbitrage Scalper", "ua": "Grok Арбитраж Скалпер",
+    "6": {"ru": "Grok Арбитраж Скалпер", "en": "Grok Arbitrage Scalper", "ua": "Grok Арбитраж Скалпер",
           "es": "Grok Arbitrage Scalper", "ar": "Grok Arbitrage Scalper", "fr": "Grok Arbitrage Scalper",
           "price": 29, "file": "arbitrage_bot.py",
           "teaser_ru": "Автоматический поиск разницы цен на биржах в реальном времени. Полный код — после оплаты."},
@@ -83,6 +83,18 @@ def show_catalog(message):
     markup.add(InlineKeyboardButton("О нашей компании", callback_data="about"))
     markup.add(InlineKeyboardButton("Политика конфиденциальности", callback_data="privacy"))
     bot.send_message(message.chat.id, text, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "about")
+def about_company(call):
+    bot.answer_callback_query(call.id)
+    text = "Grok-OMEGA — команда разработчиков и предпринимателей, которая создаёт мощные инструменты автоматизации бизнеса. С 2025 года мы помогаем обычным людям запускать стабильный пассивный доход без специального образования. Наша цель — сделать сложные вещи простыми и доступными для каждого, кто готов сделать первый шаг."
+    bot.send_message(call.message.chat.id, text)
+
+@bot.callback_query_handler(func=lambda call: call.data == "privacy")
+def privacy_policy(call):
+    bot.answer_callback_query(call.id)
+    text = "🔒 Политика конфиденциальности\n\nМы уважаем вашу конфиденциальность. Все данные (кошельки, токены, переписка, платежи) используются только для обработки заказов и доставки товаров. Мы не передаём вашу информацию третьим лицам и не используем её в маркетинговых целях. При любых вопросах пишите @grom_ii."
+    bot.send_message(call.message.chat.id, text)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
 def buy_callback(call):
