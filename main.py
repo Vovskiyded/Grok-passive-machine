@@ -56,7 +56,7 @@ PRODUCTS = {
     "11": {"ru": "Покупка аккаунтов Telegram / WhatsApp", "en": "Buying Telegram / WhatsApp Accounts", "ua": "Купівля акаунтів Telegram / WhatsApp",
            "es": "Compra de cuentas Telegram / WhatsApp", "ar": "شراء حسابات Telegram / WhatsApp", "fr": "Achat de comptes Telegram / WhatsApp",
            "price": 23, "file": "accounts_pack.txt",
-           "teaser_ru": "Покупка прогретых аккаунтов Telegram и WhatsApp. 23$ на месяц или 88$ на год. Актуальные аккаунты с историей и хорошей прогревкой. Заказ через поддержку — после оплаты."}
+           "teaser_ru": "Покупка прогретых аккаунтов Telegram и WhatsApp. 23$ на месяц или 88$ на год. Актуальные аккаунты с историей. Заказ через поддержку — после оплаты."}
 }
 
 @bot.message_handler(commands=['start'])
@@ -96,7 +96,7 @@ def buy_callback(call):
     bot.answer_callback_query(call.id)
     teaser = p['teaser_ru'] if lang == 'ru' else p.get('teaser_en', p['teaser_ru'])
     markup = InlineKeyboardMarkup(row_width=1)
-    markup.add(InlineKeyboardButton("💰 Купить", callback_data=f"paymenu_{num}"))
+    markup.add(InlineKeyboardButton("💰 Купить за $" + str(p['price']), callback_data=f"paymenu_{num}"))
     bot.send_message(call.message.chat.id, teaser, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('paymenu_'))
