@@ -53,10 +53,10 @@ PRODUCTS = {
            "es": "Grok Funnel Pro", "ar": "Grok Funnel Pro", "fr": "Grok Funnel Pro",
            "price": 35, "file": "funnel_bot.py",
            "teaser_ru": "5-шаговая продающая воронка, которая ведёт клиента до оплаты. Полная настройка — после оплаты."},
-    "11": {"ru": "Покупка аккаунтов Telegram / WhatsApp", "en": "Buying Telegram / WhatsApp Accounts", "ua": "Купівля акаунтів Telegram / WhatsApp",
-           "es": "Compra de cuentas Telegram / WhatsApp", "ar": "شراء حسابات Telegram / WhatsApp", "fr": "Achat de comptes Telegram / WhatsApp",
-           "price": 23, "file": "accounts_pack.txt",
-           "teaser_ru": "Покупка прогретых аккаунтов Telegram и WhatsApp. 23$ на месяц или 88$ на год. Актуальные аккаунты с историей. Заказ через поддержку — после оплаты."}
+    "11": {"ru": "Купить номер для Telegram / WhatsApp", "en": "Buy Telegram / WhatsApp Number", "ua": "Купити номер для Telegram / WhatsApp",
+           "es": "Comprar número para Telegram / WhatsApp", "ar": "شراء رقم لـ Telegram / WhatsApp", "fr": "Acheter un numéro pour Telegram / WhatsApp",
+           "price": 24, "file": "numbers_pack.txt",
+           "teaser_ru": "Покупка прогретых номеров для регистрации Telegram и WhatsApp. 24$ на месяц или 88$ на год. Актуальные номера с хорошей историей. Заказ через поддержку — после оплаты."}
 }
 
 @bot.message_handler(commands=['start'])
@@ -118,7 +118,7 @@ def payment_choice(call):
         pending_tx[call.from_user.id] = num
     else:
         bot.send_message(call.message.chat.id, "Оплата другими способами:\n@grom_ii\n\nПосле оплаты напиши «ОПЛАТИЛ " + num + "»")
-        pending_tx[call.from_user.id] = num
+        pending_tx[call.from_user.id] = num)
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
@@ -158,5 +158,5 @@ def check_trx(txid, expected_amount):
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
-print("🚀 Бот запущен с новым продуктом «Покупка аккаунтов Telegram / WhatsApp»")
+print("🚀 Бот запущен с новым продуктом «Купить номер для Telegram / WhatsApp»")
 bot.infinity_polling()
