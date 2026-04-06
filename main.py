@@ -52,7 +52,11 @@ PRODUCTS = {
     "10": {"ru": "Grok Воронка Pro", "en": "Grok Funnel Pro", "ua": "Grok Воронка Pro",
            "es": "Grok Funnel Pro", "ar": "Grok Funnel Pro", "fr": "Grok Funnel Pro",
            "price": 35, "file": "funnel_bot.py",
-           "teaser_ru": "5-шаговая продающая воронка, которая ведёт клиента до оплаты. Полная настройка — после оплаты."}
+           "teaser_ru": "5-шаговая продающая воронка, которая ведёт клиента до оплаты. Полная настройка — после оплаты."},
+    "11": {"ru": "Покупка аккаунтов Telegram / WhatsApp", "en": "Buying Telegram / WhatsApp Accounts", "ua": "Купівля акаунтів Telegram / WhatsApp",
+           "es": "Compra de cuentas Telegram / WhatsApp", "ar": "شراء حسابات Telegram / WhatsApp", "fr": "Achat de comptes Telegram / WhatsApp",
+           "price": 23, "file": "accounts_pack.txt",
+           "teaser_ru": "Покупка прогретых аккаунтов Telegram и WhatsApp. 23$ на месяц или 88$ на год. Актуальные аккаунты с историей и хорошей прогревкой. Заказ через поддержку — после оплаты."}
 }
 
 @bot.message_handler(commands=['start'])
@@ -84,18 +88,6 @@ def show_catalog(message):
     markup.add(InlineKeyboardButton("Политика конфиденциальности", callback_data="privacy"))
     bot.send_message(message.chat.id, text, reply_markup=markup)
 
-@bot.callback_query_handler(func=lambda call: call.data == "about")
-def about_company(call):
-    bot.answer_callback_query(call.id)
-    text = "Grok-OMEGA — команда разработчиков и предпринимателей, которая создаёт мощные инструменты автоматизации бизнеса. С 2025 года мы помогаем обычным людям запускать стабильный пассивный доход без специального образования. Наша цель — сделать сложные вещи простыми и доступными для каждого, кто готов сделать первый шаг."
-    bot.send_message(call.message.chat.id, text)
-
-@bot.callback_query_handler(func=lambda call: call.data == "privacy")
-def privacy_policy(call):
-    bot.answer_callback_query(call.id)
-    text = "🔒 Политика конфиденциальности\n\nМы уважаем вашу конфиденциальность. Все данные (кошельки, токены, переписка, платежи) используются только для обработки заказов и доставки товаров. Мы не передаём вашу информацию третьим лицам и не используем её в маркетинговых целях. При любых вопросах пишите @grom_ii."
-    bot.send_message(call.message.chat.id, text)
-
 @bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
 def buy_callback(call):
     num = call.data.split('_')[1]
@@ -104,7 +96,7 @@ def buy_callback(call):
     bot.answer_callback_query(call.id)
     teaser = p['teaser_ru'] if lang == 'ru' else p.get('teaser_en', p['teaser_ru'])
     markup = InlineKeyboardMarkup(row_width=1)
-    markup.add(InlineKeyboardButton("💰 Купить за $" + str(p['price']), callback_data=f"paymenu_{num}"))
+    markup.add(InlineKeyboardButton("💰 Купить", callback_data=f"paymenu_{num}"))
     bot.send_message(call.message.chat.id, teaser, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('paymenu_'))
@@ -166,5 +158,5 @@ def check_trx(txid, expected_amount):
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
-print("🚀 Бот запущен")
+print("🚀 Бот запущен с новым продуктом «Покупка аккаунтов Telegram / WhatsApp»")
 bot.infinity_polling()
