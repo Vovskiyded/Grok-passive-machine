@@ -33,7 +33,7 @@ PRODUCTS = {
           "es": "Grok TikTok Rocket", "ar": "Grok TikTok Rocket", "fr": "Grok TikTok Rocket",
           "price": 49, "file": "tiktok_bot.py",
           "teaser_ru": "Бот, который полностью берёт на себя продвижение в TikTok: сам добавляет текст и публикует faceless-видео каждые 4 часа. Полный код — после оплаты."},
-    "6": {"ru": "Grok Арбитраж Скалпер", "en": "Grok Arbitrage Scalper", "ua": "Grok Арбитраж Скалпер",
+    "6": {"ru": "Grok Арбитраж Скальпер", "en": "Grok Arbitrage Scalper", "ua": "Grok Арбитраж Скалпер",
           "es": "Grok Arbitrage Scalper", "ar": "Grok Arbitrage Scalper", "fr": "Grok Arbitrage Scalper",
           "price": 29, "file": "arbitrage_bot.py",
           "teaser_ru": "Автоматический поиск разницы цен на биржах в реальном времени. Полный код — после оплаты."},
