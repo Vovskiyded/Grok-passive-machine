@@ -10,40 +10,43 @@ ADMIN_ID = int(os.getenv('ADMIN_CHAT_ID'))
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 current_lang = {}
-pending_tx = {}  # user_id → product_num
+pending_tx = {}
+pending_product = {}
 
 PRODUCTS = {
-    "1": {"ru": "Grok АвтоПродажник", "en": "Grok AutoSeller", "price": 25, "file": "sales_bot.py",
-          "teaser_ru": "Тизер (30%): Бот сам показывает каталог, принимает оплату USDT и мгновенно выдаёт файлы. Пример: клиент выбирает товар №3 → бот пишет «ОПЛАТИЛ 3» → файл улетает автоматически. Полный код и настройка — после оплаты."},
-    "2": {"ru": "Grok Промпт-Арсенал 100", "en": "Grok Prompt Arsenal 100", "price": 12, "file": "prompts.txt",
-          "teaser_ru": "Тизер (30%): Вот 3 реальных промпта из 100: 1. «Напиши 10 вирусных идей TikTok для пассивного дохода». 2. «Создай бизнес-план на 30 дней с доходом 1000$». 3. «Составь 20 продающих постов для Telegram-канала». Полные 100 — после оплаты."},
-    "3": {"ru": "Grok Арбитраж-Скальпер", "en": "Grok Arbitrage Scalper", "price": 37, "file": "arbitrage_bot.py",
-          "teaser_ru": "Тизер (30%): Бот сканирует Binance + Bybit и показывает разницу. Пример: BTC 68450$ → 68720$ = +0.4% (270$ на 1 BTC). Полный код с автоматической торговлей — после оплаты."},
-    "4": {"ru": "Grok TikTok Ракета", "en": "Grok TikTok Rocket", "price": 59, "file": "tiktok_bot.py",
-          "teaser_ru": "Тизер (30%): Бот берёт stock.mp4, добавляет текст и публикует каждые 4 часа. Пример: 1 видео → 4 поста в сутки без тебя. Полный код + cookies + расписание — после оплаты."},
-    "5": {"ru": "Grok Воронка Pro", "en": "Grok Funnel Pro", "price": 49, "file": "funnel_bot.py",
-          "teaser_ru": "Тизер (30%): 5-шаговая воронка. Шаг 1: приветствие + тизер. Шаг 2: каталог. Шаг 3: оплата. Полная настройка под твой бот — после оплаты."},
-    "6": {"ru": "Grok Безликая Фабрика", "en": "Grok Faceless Factory", "price": 39, "file": "faceless_pack.txt",
-          "teaser_ru": "Тизер (30%): 3 готовые идеи из 50: 1. График «Один бот = 400$/мес» + текст. 2. «Как я запустил 20 ботов». 3. «Пассивный доход без лица». Полные 50 идей + шаблоны — после оплаты."},
-    "7": {"ru": "Grok Охотник за Лидами", "en": "Grok Lead Hunter", "price": 35, "file": "lead_bot.py",
-          "teaser_ru": "Тизер (30%): Бот автоматически собирает username + сообщения из любого чата. Пример: @user написал «интересно» → бот сохраняет контакт. Полный код — после оплаты."},
-    "8": {"ru": "Grok Система Пассива", "en": "Grok Passive System", "price": 27, "file": "blueprint.txt",
-          "teaser_ru": "Тизер (30%): Пошаговый план: 1. Выбрать нишу. 2. Создать бота. 3. Запустить на Railway. 4. Получать 1000$+/мес. Полный blueprint на 30+ страниц — после оплаты."},
-    "9": {"ru": "Grok Запуск для Новичка", "en": "Grok Newbie Launchpad", "price": 19.99, "file": "beginner_guide.txt",
-          "teaser_ru": "Тизер (30%): Полный гайд от А до Я. Шаги: BotFather → GitHub → Railway → Variables → Redeploy. Пример: как добавить TELEGRAM_TOKEN. Полная инструкция со всеми скриншотами и ссылками — после оплаты."}
+    "1": {"ru": "Автоматизация бизнеса (20 кодов)", "en": "Business Automation (20 codes)", "ua": "Автоматизація бізнесу (20 кодів)",
+          "price": 49, "file": "automation_codes.txt",
+          "teaser_ru": "Тизер (30%): 20 готовых кодов для автоматизации продаж, лидов, контента и рутины. Полный набор — после оплаты."},
+    "2": {"ru": "Коды + инструкции (20 наборов)", "en": "Codes + Instructions (20 sets)", "ua": "Коди + інструкції (20 наборів)",
+          "price": 59, "file": "code_instructions.txt",
+          "teaser_ru": "Тизер (30%): 20 полных наборов (код + пошаговая инструкция). Полный архив — после оплаты."},
+    "3": {"ru": "Удалённая работа и заработок", "en": "Remote Work & Earning", "ua": "Віддалена робота та заробіток",
+          "price": 29.99, "file": "remote_earning.txt",
+          "teaser_ru": "Тизер (30%): Готовые способы дистанционного заработка без вложений. Полный список с инструкциями — после оплаты."}
 }
+
+def get_text(lang, key):
+    texts = {
+        "start": {
+            "ru": "Привет! 👋\n\nВ каждом паке есть готовые инструменты и подробная инструкция.\nТолько выберите для себя направление.\n\nВыбери язык / Choose language / Оберіть мову:",
+            "en": "Hi! 👋\n\nEach pack contains ready tools and detailed instructions.\nJust choose your direction.\n\nChoose language:",
+            "ua": "Привіт! 👋\n\nУ кожному пакеті є готові інструменти та детальна інструкція.\nОберіть свій напрямок.\n\nОберіть мову:"
+        },
+        "catalog": {
+            "ru": "🛒 Магазин Grok-OMEGA — пассивный доход\n\nВыберите раздел:",
+            "en": "🛒 Grok-OMEGA Store — passive income\n\nChoose section:",
+            "ua": "🛒 Магазин Grok-OMEGA — пасивний дохід\n\nОберіть розділ:"
+        }
+    }
+    return texts.get(key, {}).get(lang, texts[key]["ru"])
 
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"))
     markup.add(InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"))
-    bot.reply_to(message, 
-        "Привет! 👋\n\n"
-        "В каждом паке есть готовые инструменты и подробная инструкция к их использованию.\n"
-        "Только выберите для себя направление.\n\n"
-        "Выбери язык / Choose language:", 
-        reply_markup=markup)
+    markup.add(InlineKeyboardButton("🇺🇦 Українська", callback_data="lang_ua"))
+    bot.reply_to(message, get_text("ru", "start"), reply_markup=markup)  # по умолчанию RU
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('lang_'))
 def set_language(call):
@@ -54,13 +57,29 @@ def set_language(call):
 
 def show_catalog(message):
     lang = current_lang.get(message.chat.id, 'ru')
-    header = "🛒 Магазин Grok-OMEGA — пассивный доход\n\n" if lang == 'ru' else "🛒 Grok-OMEGA Store — passive income\n\n"
-    text = header
+    text = get_text(lang, "catalog")
     markup = InlineKeyboardMarkup(row_width=1)
-    for k, p in PRODUCTS.items():
-        text += f"{k}. {p[lang]} — ${p['price']}\n"
-        markup.add(InlineKeyboardButton(f"{k}. {p[lang]}", callback_data=f"buy_{k}"))
+    markup.add(InlineKeyboardButton("1. Автоматизация бизнеса (20 кодов)", callback_data="buy_1"))
+    markup.add(InlineKeyboardButton("2. Коды + инструкции (20 наборов)", callback_data="buy_2"))
+    markup.add(InlineKeyboardButton("3. Удалённая работа и заработок", callback_data="buy_3"))
+    markup.add(InlineKeyboardButton("ℹ️ О нашей компании", callback_data="about"))
+    markup.add(InlineKeyboardButton("🔒 Политика конфиденциальности", callback_data="privacy"))
     bot.send_message(message.chat.id, text, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "about")
+def about_company(call):
+    lang = current_lang.get(call.from_user.id, 'ru')
+    text = {
+        "ru": "Grok-OMEGA — команда разработчиков и предпринимателей, которая создаёт мощные инструменты автоматизации и помогает обычным людям запускать стабильный пассивный доход.\n\nС 2025 года мы сочетаем передовые технологии Grok с практическими решениями, которые уже используют сотни пользователей по всему миру.\n\nНаша цель — сделать сложные вещи простыми и доступными для каждого, кто готов сделать первый шаг.",
+        "en": "Grok-OMEGA is a team of developers and entrepreneurs creating powerful automation tools and helping ordinary people launch stable passive income.\n\nSince 2025 we combine Grok technologies with practical solutions used by hundreds of users worldwide.\n\nOur goal is to make complex things simple and accessible to everyone ready to take the first step.",
+        "ua": "Grok-OMEGA — команда розробників та підприємців, яка створює потужні інструменти автоматизації та допомагає звичайним людям запускати стабільний пасивний дохід.\n\nЗ 2025 року ми поєднуємо передові технології Grok з практичними рішеннями, які вже використовують сотні користувачів по всьому світу.\n\nНаша мета — зробити складні речі простими та доступними для кожного, хто готовий зробити перший крок."
+    }
+    bot.send_message(call.message.chat.id, text.get(lang, text["ru"]))
+
+@bot.callback_query_handler(func=lambda call: call.data == "privacy")
+def privacy_policy(call):
+    text = "🔒 Политика конфиденциальности\n\nМы уважаем вашу конфиденциальность. Все данные (кошельки, контакты, платежи) используются исключительно для обработки заказов и доставки товаров.\n\nМы не передаём вашу информацию третьим лицам и не используем её в маркетинговых целях без вашего согласия.\n\nВсе платежи обрабатываются безопасно. При возникновении вопросов пишите @Volodya."
+    bot.send_message(call.message.chat.id, text)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('buy_'))
 def buy_callback(call):
@@ -70,17 +89,27 @@ def buy_callback(call):
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, p['teaser_ru'] if lang == 'ru' else p.get('teaser_en', p['teaser_ru']))
     bot.send_message(call.message.chat.id, "✅ Вы выбрали: " + p[lang] if lang == 'ru' else "✅ You chose: " + p[lang])
-    bot.send_message(call.message.chat.id, "Оплата: $" + str(p['price']) + " USDT (TRC20)" if lang == 'ru' else "Payment: $" + str(p['price']) + " USDT (TRC20)")
-    bot.send_message(call.message.chat.id, "Переведи на:\n" + CRYPTO_WALLET if lang == 'ru' else "Send to:\n" + CRYPTO_WALLET)
-    bot.send_message(call.message.chat.id, "После оплаты пришли TXID транзакции")
-    pending_tx[call.from_user.id] = num   # ← СРАЗУ запоминаем товар
+    # Выбор оплаты
+    markup = InlineKeyboardMarkup(row_width=2)
+    markup.add(InlineKeyboardButton("💎 USDT TRC20", callback_data=f"pay_usdt_{num}"))
+    markup.add(InlineKeyboardButton("💳 Перевод на карту", callback_data=f"pay_card_{num}"))
+    bot.send_message(call.message.chat.id, "Выберите способ оплаты:", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('pay_'))
+def payment_choice(call):
+    action, num = call.data.split('_')[1:]
+    if action == "usdt":
+        bot.send_message(call.message.chat.id, "Оплата: $" + str(PRODUCTS[num]['price']) + " USDT (TRC20)\nПереведи на:\n" + CRYPTO_WALLET + "\n\nПосле оплаты пришли TXID")
+        pending_tx[call.from_user.id] = num
+    else:
+        bot.send_message(call.message.chat.id, "Оплата на карту:\n@Volodya\n\nПосле оплаты напиши «ОПЛАТИЛ " + num + "»")
+        pending_tx[call.from_user.id] = num
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
     text = message.text.strip()
     user_id = message.chat.id
-
-    if user_id in pending_tx:                                 # ← Главное исправление
+    if user_id in pending_tx:
         num = pending_tx[user_id]
         p = PRODUCTS[num]
         lang = current_lang.get(user_id, 'ru')
@@ -97,18 +126,8 @@ def handle(message):
             del pending_tx[user_id]
         else:
             bot.reply_to(message, msg + "\nПроверь TXID и попробуй ещё раз.")
-    elif "ОПЛАТИЛ" in text.upper():
-        try:
-            num = text.split()[1]
-            if num not in PRODUCTS:
-                bot.reply_to(message, "Неверный номер")
-                return
-            bot.reply_to(message, "Пришли TXID транзакции")
-            pending_tx[message.chat.id] = num
-        except:
-            bot.reply_to(message, "Напиши «ОПЛАТИЛ X»")
     else:
-        bot.reply_to(message, "Напиши /catalog")
+        bot.reply_to(message, "Напиши /start")
 
 def check_trx(txid, expected_amount):
     try:
@@ -124,5 +143,5 @@ def check_trx(txid, expected_amount):
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
-print("🚀 Бот с мгновенной проверкой TXID запущен")
+print("🚀 Бот с 3 разделами и расширенными функциями запущен")
 bot.infinity_polling()
