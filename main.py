@@ -118,7 +118,7 @@ def payment_choice(call):
         pending_tx[call.from_user.id] = num
     else:
         bot.send_message(call.message.chat.id, "Оплата другими способами:\n@grom_ii\n\nПосле оплаты напиши «ОПЛАТИЛ " + num + "»")
-        pending_tx[call.from_user.id] = num)
+        pending_tx[call.from_user.id] = num
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
@@ -158,5 +158,5 @@ def check_trx(txid, expected_amount):
     except:
         return False, "Ошибка проверки TXID. Попробуй ещё раз."
 
-print("🚀 Бот запущен с новым продуктом «Купить номер для Telegram / WhatsApp»")
+print("🚀 Бот запущен")
 bot.infinity_polling()
